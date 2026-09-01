@@ -119,14 +119,20 @@ async def upload_image(file: UploadFile = File(...), current_user: dict = Depend
     # disk only when Cloudinary is not configured (local dev). The
     # BACKEND_PUBLIC_URL absolutize step below also covers the local-disk
     # fallback for cross-origin dev setups.
+    import uuid
     from app.services import cloudinary_service
 
     if cloudinary_service.is_configured():
+        # Each upload gets a unique public_id. Without the uuid suffix,
+        # every upload by the same seller would overwrite the previous
+        # file at the same path, causing all products to display the
+        # most recently uploaded image.
+        unique_public_id = f"hatify-{current_user['user_id']}-{uuid.uuid4().hex[:12]}"
         try:
             result = cloudinary_service.upload_bytes(
                 content,
                 folder="hatify/products",
-                public_id=f"hatify-{current_user['user_id']}",
+                public_id=unique_public_id,
             )
         except Exception as e:
             raise HTTPException(
