@@ -114,6 +114,28 @@ async def upload_image(file: UploadFile = File(...), current_user: dict = Depend
             detail=f"File too large. Maximum size: {MAX_IMAGE_SIZE // (1024*1024)}MB",
         )
 
+    # Prefer Cloudinary (production / any non-ephemeral environment) so
+    # images survive container restarts and redeploys. Fall back to local
+    # disk only when Cloudinary is not configured (local dev). The
+    # BACKEND_PUBLIC_URL absolutize step below also covers the local-disk
+    # fallback for cross-origin dev setups.
+    from app.services import cloudinary_service
+
+    if cloudinary_service.is_configured():
+        try:
+            result = cloudinary_service.upload_bytes(
+                content,
+                folder="hatify/products",
+                public_id=f"hatify-{current_user['user_id']}",
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Cloudinary upload failed: {e}",
+            )
+        image_url = result.get("secure_url") or result.get("url", "")
+        return {"image_url": image_url, "filename": result.get("public_id", "")}
+
     import os
     import uuid
     upload_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")

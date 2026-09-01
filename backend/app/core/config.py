@@ -38,6 +38,17 @@ class Settings(BaseSettings):
     # public origin so <img src="..."> works cross-origin.
     BACKEND_PUBLIC_URL: str = ""
 
+    # Cloudinary credentials for product image storage. Either set
+    # CLOUDINARY_URL ("cloudinary://API_KEY:API_SECRET@CLOUD_NAME") or all
+    # three of CLOUDINARY_CLOUD_NAME / CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET.
+    # When set, the seller product image upload endpoint stores files in
+    # Cloudinary (free tier) instead of the local disk, so images survive
+    # Render restarts / redeploys. Required in production.
+    CLOUDINARY_URL: str = ""
+    CLOUDINARY_CLOUD_NAME: str = ""
+    CLOUDINARY_API_KEY: str = ""
+    CLOUDINARY_API_SECRET: str = ""
+
     ADMIN_NAME: str = "Hatify Admin"
     ADMIN_EMAIL: str = "mdanis.dev@gmail.com"
     ADMIN_PASSWORD: str = "change-me"
