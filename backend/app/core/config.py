@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     SUPPORT_EMAIL: str = "support@hatify.example.com"
     BRAND_LOGO_PATH: str = "static/hatify-logo.png"
 
+    # Public base URL the browser uses to reach this API. Used to build
+    # absolute URLs for uploaded product images (e.g. https://api.example.com
+    # or http://localhost:8000 in dev). Leave empty in dev if you proxy
+    # /uploads/ through the frontend; in production set this to the API's
+    # public origin so <img src="..."> works cross-origin.
+    BACKEND_PUBLIC_URL: str = ""
+
     ADMIN_NAME: str = "Hatify Admin"
     ADMIN_EMAIL: str = "mdanis.dev@gmail.com"
     ADMIN_PASSWORD: str = "change-me"

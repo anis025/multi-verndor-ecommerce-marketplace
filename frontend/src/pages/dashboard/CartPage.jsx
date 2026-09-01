@@ -100,7 +100,15 @@ export default function CartPage() {
             {items.map((it) => (
               <div key={it.product_id} className="dash-cart-item">
                 <div className="dash-cart-image">
-                  <img src={it.image_url || "/placeholder.png"} alt={it.product_name} />
+                  <img
+                    src={it.image_url || "/placeholder.png"}
+                    alt={it.product_name}
+                    onError={(e) => {
+                      if (e.currentTarget.src !== window.location.origin + "/placeholder.png") {
+                        e.currentTarget.src = "/placeholder.png";
+                      }
+                    }}
+                  />
                 </div>
                 <div className="dash-cart-info">
                   <Link to={`/products/${it.product_id}`} className="dash-cart-name">

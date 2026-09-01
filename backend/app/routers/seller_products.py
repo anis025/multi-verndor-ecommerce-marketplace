@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File
 from typing import Optional
 
+from app.core.config import settings
 from app.schemas.product import ProductCreateRequest, ProductUpdateRequest
 from app.services.product_service import ProductService
 from app.services.seller_service import SellerService
@@ -125,4 +126,9 @@ async def upload_image(file: UploadFile = File(...), current_user: dict = Depend
     with open(filepath, "wb") as f:
         f.write(content)
 
-    return {"image_url": f"/uploads/{filename}", "filename": filename}
+    image_url = f"/uploads/{filename}"
+    base = (settings.BACKEND_PUBLIC_URL or "").rstrip("/")
+    if base:
+        image_url = f"{base}{image_url}"
+
+    return {"image_url": image_url, "filename": filename}

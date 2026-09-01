@@ -34,7 +34,15 @@ export default function Cart() {
             {cart.items.map((item) => (
               <div key={item.product_id} className="cart-item">
                 <div className="cart-item-image">
-                  <img src={item.image_url || "/placeholder.png"} alt={item.product_name} />
+                  <img
+                    src={item.image_url || "/placeholder.png"}
+                    alt={item.product_name}
+                    onError={(e) => {
+                      if (e.currentTarget.src !== window.location.origin + "/placeholder.png") {
+                        e.currentTarget.src = "/placeholder.png";
+                      }
+                    }}
+                  />
                 </div>
                 <div className="cart-item-info">
                   <Link to={`/products/${item.product_id}`} className="cart-item-name">

@@ -1,9 +1,25 @@
 from datetime import datetime, timezone
 from bson import ObjectId
 
+from app.core.config import settings
 from app.db.mongodb import get_database
 from app.repositories.cart_repository import CartRepository
 from app.repositories.product_repository import ProductRepository
+
+
+def _absolutize_image_url(url: str) -> str:
+    """Convert a stored /uploads/... path into an absolute URL the browser
+    can fetch cross-origin. Leaves external URLs (http/https) and empty
+    strings untouched. No-op when BACKEND_PUBLIC_URL is not configured.
+    """
+    if not url or url.startswith("http://") or url.startswith("https://"):
+        return url
+    base = (settings.BACKEND_PUBLIC_URL or "").rstrip("/")
+    if not base:
+        return url
+    if url.startswith("/"):
+        return f"{base}{url}"
+    return f"{base}/{url}"
 
 
 class CartService:
@@ -151,7 +167,7 @@ class CartService:
                 "price": price,
                 "quantity": quantity,
                 "stock": product.get("stock", 0),
-                "image_url": product.get("image_url", ""),
+                "image_url": _absolutize_image_url(product.get("image_url", "")),
                 "subtotal": subtotal,
             })
         return items
