@@ -64,6 +64,12 @@ app.include_router(admin_audit_router)
 app.include_router(admin_auth_router)
 app.include_router(reviews_router)
 
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "app": "Hatify"
+    }
 
 @app.on_event("startup")
 def startup_db():
